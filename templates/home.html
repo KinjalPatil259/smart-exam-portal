@@ -2,47 +2,302 @@
 {% block title %}Smart Online Exam Management System{% endblock %}
 
 {% block content %}
-<div style="padding: 60px 0; text-align: center; animation: fadeInUp 0.8s ease;">
-    <h1 style="font-size: 3.5rem; font-weight: 800; font-family: 'Outfit', sans-serif; line-height: 1.2; margin-bottom: 20px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        The Smarter Way to Conduct Online Exams
-    </h1>
-    <p style="font-size: 1.25rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto 35px auto;">
-        An industry-level, highly secure, and intuitive examination environment. Empowering administrators to design custom assessments and students to achieve excellence with instant analytical feedback.
-    </p>
-    
-    <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 50px;">
-        {% if session.get('user_id') %}
-            <a href="{{ url_for('admin.dashboard' if session.get('role') == 'admin' else 'student.dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
-        {% else %}
-            <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="padding: 12px 30px; font-size: 1rem;">Get Started</a>
-            <a href="/about" class="btn btn-secondary" style="padding: 12px 30px; font-size: 1rem;">Learn More</a>
-        {% endif %}
+<div style="animation: fadeInUp 0.8s ease;">
+    <!-- Hero Section -->
+    <div class="hero-wrapper">
+        <div class="hero-content">
+            <span class="hero-tagline">🚀 Premium Assessment Platform</span>
+            <h1 style="font-size: 3.5rem; font-weight: 800; font-family: 'Outfit', sans-serif; line-height: 1.2; margin-bottom: 20px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                The Smarter Way to Conduct Online Exams
+            </h1>
+            <p style="font-size: 1.2rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 30px;">
+                An industry-grade, highly secure, and intuitive examination environment. Empowering administrators to design custom assessments and students to achieve excellence with instant analytical feedback.
+            </p>
+            <div class="hero-buttons">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('admin.dashboard' if session.get('role') == 'admin' else 'student.dashboard') }}" class="btn btn-primary" style="padding: 14px 32px; font-size: 1.05rem;">Go to Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="padding: 14px 32px; font-size: 1.05rem;">Get Started</a>
+                    <a href="/about" class="btn btn-secondary" style="padding: 14px 32px; font-size: 1.05rem;">Learn More</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="hero-preview">
+            <!-- Simulated Secure Exam GUI Mockup -->
+            <div class="simulator-card">
+                <div class="sim-header">
+                    <div class="sim-dots">
+                        <span class="sim-dot red"></span>
+                        <span class="sim-dot yellow"></span>
+                        <span class="sim-dot green"></span>
+                    </div>
+                    <span class="sim-title">SECURE_EXAM_SESSION // ACTIVE</span>
+                </div>
+                <div class="sim-body">
+                    <div class="sim-meta">
+                        <div class="sim-security-badge">
+                            <span>🛡️</span> Security Check: OK
+                        </div>
+                        <span class="sim-timer">⏱️ 00:44:59</span>
+                    </div>
+                    
+                    <div class="sim-question-box">
+                        <h4 style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Question 3 of 10</h4>
+                        <div class="sim-question-text">
+                            Which of the following is true regarding transaction isolation levels in a secure SQL database?
+                        </div>
+                        <div class="sim-options">
+                            <div class="sim-option-item">
+                                <span class="sim-bullet">A</span>
+                                <span>Read Uncommitted allows dirty reads.</span>
+                            </div>
+                            <div class="sim-option-item selected">
+                                <span class="sim-bullet">B</span>
+                                <span>Serializable is the most secure level.</span>
+                            </div>
+                            <div class="sim-option-item">
+                                <span class="sim-bullet">C</span>
+                                <span>Repeatable Read guarantees no phantom reads.</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sim-footer">
+                        <span class="btn btn-secondary btn-sm" style="opacity: 0.6; pointer-events: none;">&larr; Back</span>
+                        <span class="btn btn-primary btn-sm" style="pointer-events: none;">Save & Next &rarr;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Core Features Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 40px; text-align: left;">
-        <div class="glass-panel" style="padding: 30px;">
-            <div style="font-size: 2.5rem; margin-bottom: 15px;">🛡️</div>
-            <h3 style="font-size: 1.25rem; margin-bottom: 10px;">Secure Assessment</h3>
-            <p style="color: var(--text-secondary); font-size: 0.95rem;">
-                Armed with tab-focus tracking, session safeguards, role controls, and secure password hashing.
-            </p>
+    <!-- Stats Banner -->
+    <div class="landing-section" style="border-top: none; padding-top: 20px;">
+        <div class="glass-panel stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">50K+</div>
+                <div class="stat-label">Exams Administered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">99.9%</div>
+                <div class="stat-label">System Uptime</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">15K+</div>
+                <div class="stat-label">Active Candidates</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0.0s</div>
+                <div class="stat-label">Proctoring Latency</div>
+            </div>
         </div>
+    </div>
 
-        <div class="glass-panel" style="padding: 30px;">
-            <div style="font-size: 2.5rem; margin-bottom: 15px;">⏱️</div>
-            <h3 style="font-size: 1.25rem; margin-bottom: 10px;">Automated Timer</h3>
-            <p style="color: var(--text-secondary); font-size: 0.95rem;">
-                Built-in digital countdown timers. Automatically submits student response forms when duration expires.
-            </p>
+    <!-- Core Features Grid Section -->
+    <div class="landing-section">
+        <div class="section-header">
+            <h2>Fully Featured Evaluation Framework</h2>
+            <p>Engineered to deliver high integrity evaluations with zero operational friction.</p>
         </div>
+        <div class="features-grid-custom">
+            <div class="feature-card-custom">
+                <div class="feature-icon-wrapper">🛡️</div>
+                <h3>Secure Environment</h3>
+                <p>Equipped with strict role-based controls, password hashing, and active session validation protocols.</p>
+            </div>
+            <div class="feature-card-custom">
+                <div class="feature-icon-wrapper">⏱️</div>
+                <h3>Auto-Submit Timers</h3>
+                <p>Digital countdown timers trigger automatically upon starting an assessment, submitting responses when time runs out.</p>
+            </div>
+            <div class="feature-card-custom">
+                <div class="feature-icon-wrapper">📊</div>
+                <h3>Analytics & Reports</h3>
+                <p>Get instant score calculators, performance ratios, and clear pass/fail thresholds upon completion.</p>
+            </div>
+            <div class="feature-card-custom">
+                <div class="feature-icon-wrapper">👁️</div>
+                <h3>Anti-Tab Switching</h3>
+                <p>Tracks navigation interruptions and window blur events dynamically to log session compliance metrics.</p>
+            </div>
+            <div class="feature-card-custom">
+                <div class="feature-icon-wrapper">📚</div>
+                <h3>Subject Management</h3>
+                <p>Organize examinations easily by department or subject fields with streamlined question pools.</p>
+            </div>
+            <div class="feature-card-custom">
+                <div class="feature-icon-wrapper">📥</div>
+                <h3>Data Exporting</h3>
+                <p>Export comprehensive student score statistics to Microsoft Excel sheets or generate download-ready PDF reports.</p>
+            </div>
+        </div>
+    </div>
 
-        <div class="glass-panel" style="padding: 30px;">
-            <div style="font-size: 2.5rem; margin-bottom: 15px;">📈</div>
-            <h3 style="font-size: 1.25rem; margin-bottom: 10px;">Analytics & Reports</h3>
-            <p style="color: var(--text-secondary); font-size: 0.95rem;">
-                Instant score calculation, pass/fail thresholds, and PDF score report downloading.
-            </p>
+    <!-- Workflow / Stepper Section -->
+    <div class="landing-section">
+        <div class="section-header">
+            <h2>Seamless Assessment Journey</h2>
+            <p>A step-by-step pipeline from question setup to immediate analytics generation.</p>
+        </div>
+        <div class="stepper-row">
+            <div class="stepper-card">
+                <div class="stepper-number">1</div>
+                <h3>Design & Curate</h3>
+                <p>Admins create examinations, set scoring rules, configure constraints, and populate questions.</p>
+            </div>
+            <div class="stepper-card">
+                <div class="stepper-number">2</div>
+                <h3>Enroll & Access</h3>
+                <p>Students log in securely, check schedules, and launch their dashboard interface.</p>
+            </div>
+            <div class="stepper-card">
+                <div class="stepper-number">3</div>
+                <h3>Conduct Secured</h3>
+                <p>Exams are completed under auto-tracked browser controls with real-time countdown alerts.</p>
+            </div>
+            <div class="stepper-card">
+                <div class="stepper-number">4</div>
+                <h3>Review & Export</h3>
+                <p>Scores are tabulated instantly. Administrators download details or export to Excel tables.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Use Cases Section -->
+    <div class="landing-section">
+        <div class="section-header">
+            <h2>Tailored for Every User</h2>
+            <p>Discover how SmartExam aligns roles to streamline the examination cycle.</p>
+        </div>
+        <div class="use-cases-container">
+            <div class="use-case-panel">
+                <span class="use-case-badge admin-badge">For Instructors</span>
+                <h3>Administrative Authority</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Empower educators and administrators with powerful control utilities and real-time oversight metrics.</p>
+                <ul class="use-case-list">
+                    <li><span class="check-icon">✓</span> <span>Easily design custom question banks across multiple subjects</span></li>
+                    <li><span class="check-icon">✓</span> <span>Manage student records and monitor enrollment states</span></li>
+                    <li><span class="check-icon">✓</span> <span>Oversee exam durations, negative markings, and pass ratios</span></li>
+                    <li><span class="check-icon">✓</span> <span>Download aggregated department progress in Excel format</span></li>
+                </ul>
+            </div>
+            <div class="use-case-panel">
+                <span class="use-case-badge student-badge">For Examinees</span>
+                <h3>Streamlined Testing</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Provide students with a clean, stress-free layout that lets them focus entirely on their performance.</p>
+                <ul class="use-case-list">
+                    <li><span class="check-icon">✓</span> <span>Interactive dashboard showing available and completed tests</span></li>
+                    <li><span class="check-icon">✓</span> <span>Distraction-free assessment screen with automated timers</span></li>
+                    <li><span class="check-icon">✓</span> <span>Instant feedback showing grades and correctness analytics</span></li>
+                    <li><span class="check-icon">✓</span> <span>Generate official PDF scorecards right after submission</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="landing-section">
+        <div class="section-header">
+            <h2>Trusted by Educators and Students</h2>
+            <p>See what users are saying about the security and convenience of SmartExam.</p>
+        </div>
+        <div class="testimonial-grid-custom">
+            <div class="testimonial-card-custom">
+                <div class="testimonial-text">
+                    "Switching to SmartExam saved our department countless hours of coordination. The automatic timer and Excel exports are incredibly robust."
+                </div>
+                <div class="testimonial-user">
+                    <div class="testimonial-avatar-placeholder">HT</div>
+                    <div class="testimonial-info">
+                        <h4>Dr. Helen Turner</h4>
+                        <p>Dean of Science, EduCorp</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card-custom">
+                <div class="testimonial-text">
+                    "The examination UI is clean and distraction-free. I could easily keep track of my remaining time, and my score report downloaded instantly!"
+                </div>
+                <div class="testimonial-user">
+                    <div class="testimonial-avatar-placeholder">AM</div>
+                    <div class="testimonial-info">
+                        <h4>Alex Mercer</h4>
+                        <p>Computer Science Student</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card-custom">
+                <div class="testimonial-text">
+                    "We run certified program licensing tests. The proctoring alert log and student profile validation keep our evaluations completely secure."
+                </div>
+                <div class="testimonial-user">
+                    <div class="testimonial-avatar-placeholder">KR</div>
+                    <div class="testimonial-info">
+                        <h4>Marcus Vance</h4>
+                        <p>HR Director, TechLogics</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive FAQ Section -->
+    <div class="landing-section">
+        <div class="section-header">
+            <h2>Frequently Asked Questions</h2>
+            <p>Get answers to common queries about platform capabilities and usage rules.</p>
+        </div>
+        <div class="faq-list-custom">
+            <div class="faq-item-custom">
+                <button class="faq-question-btn">
+                    <span>How secure is the platform during active examinations?</span>
+                    <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-answer-pane">
+                    <p>The system utilizes robust session trackers, security indicators, and monitors browser window focus shifts. Any event where a candidate attempts to switch tabs or minimize the window is recorded for instructor verification.</p>
+                </div>
+            </div>
+            <div class="faq-item-custom">
+                <button class="faq-question-btn">
+                    <span>What happens if a student's timer runs out?</span>
+                    <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-answer-pane">
+                    <p>The system features an automated submission hook. When the exam timer hits zero, the student's current progress is immediately finalized and uploaded securely to avoid score losses.</p>
+                </div>
+            </div>
+            <div class="faq-item-custom">
+                <button class="faq-question-btn">
+                    <span>Can admins download reports for classroom records?</span>
+                    <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-answer-pane">
+                    <p>Absolutely. Instructors can download comprehensive Excel spreadsheets listing all student scores for a given exam, and students can download individual PDF copies of their score report card.</p>
+                </div>
+            </div>
+            <div class="faq-item-custom">
+                <button class="faq-question-btn">
+                    <span>Does it support custom grading rules and negative markings?</span>
+                    <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-answer-pane">
+                    <p>Yes. When creating an exam, admins can define the default marks for correct answers and optionally input a negative marking weight (e.g. 0.25) to be subtracted for incorrect choices.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="landing-section" style="padding-bottom: 20px;">
+        <div class="cta-banner-custom">
+            <h2>Ready to Transform Your Assessments?</h2>
+            <p>Join thousands of users who have streamlined their online testing with high integrity and detailed reports.</p>
+            {% if session.get('user_id') %}
+                <a href="{{ url_for('admin.dashboard' if session.get('role') == 'admin' else 'student.dashboard') }}" class="btn btn-secondary" style="padding: 14px 35px; font-size: 1.1rem; font-weight: 700;">Go to Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary" style="padding: 14px 35px; font-size: 1.1rem; font-weight: 700;">Get Started Now &rarr;</a>
+            {% endif %}
         </div>
     </div>
 </div>
