@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Register Student - SmartExam{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="min-height: auto; padding: 20px 0;">
+    <div class="glass-panel auth-card" style="max-width: 600px;">
+        <div class="auth-title">
+            <h2>Create Student Account</h2>
+            <p>Register to take exams and view instant results</p>
+        </div>
+        
+        <form action="{{ url_for('auth.register') }}" method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="John Doe" required>
+                </div>
+                
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="john@example.com" required>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <!-- Roll Number -->
+                <div class="form-group">
+                    <label for="roll_number">Roll / Student ID *</label>
+                    <input type="text" id="roll_number" name="roll_number" class="form-control" placeholder="STU1001" required>
+                </div>
+                
+                <!-- Phone -->
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="text" id="phone" name="phone" class="form-control" placeholder="+1234567890">
+                </div>
+            </div>
+
+            <!-- Department -->
+            <div class="form-group">
+                <label for="department">Department / Branch</label>
+                <input type="text" id="department" name="department" class="form-control" placeholder="Computer Science & Engineering">
+            </div>
+
+            <!-- Bio -->
+            <div class="form-group">
+                <label for="bio">Short Bio</label>
+                <textarea id="bio" name="bio" class="form-control" rows="3" placeholder="Tell us about yourself..."></textarea>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Min 6 characters" required>
+                </div>
+                
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password *</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Re-enter password" required>
+                </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Create Account</button>
+        </form>
+        
+        <div style="margin-top: 20px; text-align: center; font-size: 0.9rem;">
+            <span style="color: var(--text-secondary);">Already registered? </span>
+            <a href="{{ url_for('auth.login') }}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign In here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

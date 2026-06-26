@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Exams Portal - SmartExam{% endblock %}
+
+{% block content %}
+<div style="animation: fadeInUp 0.5s ease;">
+    <h2 style="font-size: 2rem; margin-bottom: 25px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Exams Portal
+    </h2>
+
+    <!-- Available Exams Section -->
+    <div class="glass-panel" style="margin-bottom: 30px;">
+        <h3 style="margin-bottom: 20px; font-size: 1.25rem;">Available Exams</h3>
+        {% if active_exams_data %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                {% for item in active_exams_data %}
+                    {% set exam = item.exam %}
+                    <div style="padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.02); display: flex; flex-direction: column; justify-content: space-between; gap: 15px;">
+                        <div>
+                            <span class="badge badge-info" style="margin-bottom: 8px;">{{ exam.subject.code }}</span>
+                            <h4 style="font-size: 1.15rem; margin-bottom: 6px;">{{ exam.title }}</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px;">{{ exam.description or 'No description provided.' }}</p>
+                            
+                            <div style="font-size: 0.8rem; color: var(--text-muted); display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                                <div>⏱️ Duration: <strong>{{ exam.duration_minutes }} mins</strong></div>
+                                <div>📝 Questions: <strong>{{ exam.random_questions_count or exam.questions|length }}</strong></div>
+                                <div>💯 Max Marks: <strong>{{ exam.total_marks }}</strong></div>
+                                <div>⚠️ Penalty: <strong>-{{ exam.negative_marking_val }} / wrong</strong></div>
+                            </div>
+
+                            {% if item.completed %}
+                                <div style="font-size: 0.85rem; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05);">
+                                    <span style="color: var(--text-secondary); font-weight: 500;">Previous Attempts:</span>
+                                    <div style="max-height: 100px; overflow-y: auto; margin-top: 5px; display: flex; flex-direction: column; gap: 4px;">
+                                        {% for attempt in item.completed %}
+                                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); padding: 4px 8px; border-radius: 4px;">
+                                                <span style="color: var(--text-muted); font-size: 0.75rem;">{{ attempt.submitted_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                                <span style="font-weight: 500; color: {% if attempt.is_passed %}var(--success){% else %}var(--danger){% endif %}; font-size: 0.8rem;">
+                                                    Score: {{ attempt.score }}/{{ exam.total_marks }}
+                                                </span>
+                                                <a href="{{ url_for('exam.view_result', attempt_id=attempt.id) }}" style="font-size: 0.75rem; color: var(--primary); text-decoration: none;">Details &rarr;</a>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if item.in_progress %}
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <div style="font-size: 0.8rem; color: var(--warning); display: flex; align-items: center; gap: 4px;">
+                                    ⚠️ Attempt in progress.
+                                </div>
+                                <a href="{{ url_for('exam.take_exam', attempt_id=item.in_progress.id) }}" class="btn btn-warning btn-sm" style="width: 100%; text-align: center;">Resume Exam</a>
+                            </div>
+                        {% else %}
+                            <form action="{{ url_for('exam.start_exam', exam_id=exam.id) }}" method="POST">
+                                <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">
+                                    {% if item.completed %}Retake Exam{% else %}Start Exam{% endif %}
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: var(--text-secondary); text-align: center; padding: 30px 0;">No active exams are available to take right now.</p>
+        {% endif %}
+    </div>
+
+    <!-- Upcoming Scheduled Exams Section -->
+    <div class="glass-panel">
+        <h3 style="margin-bottom: 20px; font-size: 1.25rem;">Upcoming Exams</h3>
+        {% if upcoming %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Exam Title</th>
+                            <th>Start Date & Time</th>
+                            <th>End Date & Time</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exam in upcoming %}
+                            <tr>
+                                <td><span class="badge badge-info">{{ exam.subject.code }}</span></td>
+                                <td><strong>{{ exam.title }}</strong></td>
+                                <td>{{ exam.start_time.strftime('%Y-%m-%d %H:%M') }} UTC</td>
+                                <td>{{ exam.end_time.strftime('%Y-%m-%d %H:%M') }} UTC</td>
+                                <td>{{ exam.duration_minutes }} minutes</td>
+                                <td><span class="badge badge-warning">Scheduled</span></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: var(--text-secondary); text-align: center; padding: 30px 0;">No upcoming exams scheduled.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

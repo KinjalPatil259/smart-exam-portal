@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% block title %}Question Bank - {{ exam.title }}{% endblock %}
+
+{% block content %}
+<div style="animation: fadeInUp 0.5s ease;">
+    <!-- Back to Exams link -->
+    <a href="{{ url_for('admin.exams') }}" style="color: var(--text-secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; font-size: 0.9rem;">
+        ⬅️ Back to Exams Directory
+    </a>
+
+    <div class="glass-panel" style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <h2 style="font-size: 1.8rem; margin-bottom: 5px;">Question Bank Manager</h2>
+            <p style="color: var(--text-secondary);">Configuring questions for: <strong>{{ exam.title }}</strong> | Marks Secured: <strong>{{ exam.total_marks }}</strong></p>
+        </div>
+        <span class="badge badge-info" style="padding: 6px 12px;">Questions Count: {{ exam.questions|length }}</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 20px;">
+        <!-- Question List -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="glass-panel">
+                <h3 style="margin-bottom: 20px; font-size: 1.25rem;">Question Repository</h3>
+                
+                {% if exam.questions %}
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        {% for q in exam.questions %}
+                            <div style="padding: 18px; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.02); position: relative;">
+                                <!-- Delete Question -->
+                                <form action="{{ url_for('admin.delete_question', q_id=q.id) }}" method="POST" style="position: absolute; top: 15px; right: 15px;" onsubmit="return confirm('Remove this question and options from exam?');">
+                                    <button type="submit" class="btn btn-danger btn-sm" style="padding: 4px 8px; font-size: 0.75rem;">&times; Delete</button>
+                                </form>
+
+                                <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; font-size: 0.75rem;">
+                                    <span class="badge badge-info">Q{{ loop.index }}</span>
+                                    <span class="badge badge-success">{{ q.question_type }} choice</span>
+                                    <span class="badge badge-warning">{{ q.difficulty }}</span>
+                                    <span style="color: var(--text-muted); font-weight: bold; line-height: 2;">Marks: +{{ q.marks }} / Penalty: -{{ q.negative_marks }}</span>
+                                </div>
+
+                                <h4 style="font-size: 1.05rem; font-weight: 600; line-height: 1.5; margin-bottom: 15px; padding-right: 70px;">{{ q.question_text }}</h4>
+                                
+                                <!-- Render Choices list -->
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    {% for opt in q.options %}
+                                        <div style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--glass-border); font-size: 0.85rem; display: flex; justify-content: space-between;
+                                                    {% if opt.is_correct %}
+                                                        border-color: var(--success); background: var(--success-bg); color: var(--success); font-weight: 500;
+                                                    {% else %}
+                                                        background: var(--input-bg);
+                                                    {% endif %}">
+                                            <span>{{ opt.option_text }}</span>
+                                            {% if opt.is_correct %}
+                                                <small style="font-size: 0.75rem;">[Correct Option]</small>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: var(--text-secondary); text-align: center; padding: 40px 0;">The question bank is empty. Schedule the first question using the editor card.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Add Question Editor Form -->
+        <div class="glass-panel" style="height: fit-content; position: sticky; top: 90px;">
+            <h3 style="margin-bottom: 20px; font-size: 1.25rem;">Question Editor</h3>
+            <form action="{{ url_for('admin.questions', exam_id=exam.id) }}" method="POST" id="question-form">
+                
+                <div class="form-group">
+                    <label for="question_text">Question Description / Text *</label>
+                    <textarea id="question_text" name="question_text" class="form-control" rows="3" placeholder="Identify the correct syntax for..." required></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label for="question_type">Selection Type *</label>
+                        <select id="question_type" name="question_type" class="form-control" style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);">
+                            <option value="single">Single Choice (Radio)</option>
+                            <option value="multiple">Multiple Choices (Checkbox)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="difficulty">Difficulty Level</label>
+                        <select id="difficulty" name="difficulty" class="form-control" style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label for="marks">Marks Weightage *</label>
+                        <input type="number" id="marks" name="marks" class="form-control" value="1" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="negative_marks">Negative Marks (Penalty)</label>
+                        <input type="number" id="negative_marks" name="negative_marks" class="form-control" value="0.00" min="0" max="10" step="0.05">
+                        <small style="color: var(--text-muted); font-size: 0.7rem;">Defaults to exam setting if left 0.00.</small>
+                    </div>
+                </div>
+
+                <!-- Options Builder -->
+                <div style="margin-top: 15px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Option Alternatives *</label>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addOptionRow()" style="padding: 4px 8px; font-size: 0.75rem;">➕ Add Row</button>
+                    </div>
+                    
+                    <!-- Dynamic option containers -->
+                    <div id="options-container" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Default Rows -->
+                        <div class="option-row" style="display: flex; gap: 10px; align-items: center;">
+                            <input type="checkbox" name="correct_options[]" value="0" class="correct-chk" title="Check if this option is correct">
+                            <input type="text" name="options[]" class="form-control" placeholder="Option A" required style="padding: 8px 12px; font-size: 0.9rem;">
+                            <button type="button" onclick="removeRow(this)" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 1.1rem;">&times;</button>
+                        </div>
+                        <div class="option-row" style="display: flex; gap: 10px; align-items: center;">
+                            <input type="checkbox" name="correct_options[]" value="1" class="correct-chk" title="Check if this option is correct">
+                            <input type="text" name="options[]" class="form-control" placeholder="Option B" required style="padding: 8px 12px; font-size: 0.9rem;">
+                            <button type="button" onclick="removeRow(this)" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 1.1rem;">&times;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Question</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const optionsContainer = document.getElementById('options-container');
+    const questionType = document.getElementById('question-type');
+
+    function addOptionRow() {
+        const rowCount = optionsContainer.getElementsByClassName('option-row').length;
+        if (rowCount >= 6) {
+            alert("Maximum 6 options allowed per question.");
+            return;
+        }
+
+        const div = document.createElement('div');
+        div.className = 'option-row';
+        div.style.display = 'flex';
+        div.style.gap = '10px';
+        div.style.alignItems = 'center';
+        
+        div.innerHTML = `
+            <input type="checkbox" name="correct_options[]" value="${rowCount}" class="correct-chk" title="Check if this option is correct">
+            <input type="text" name="options[]" class="form-control" placeholder="Next alternative option" required style="padding: 8px 12px; font-size: 0.9rem;">
+            <button type="button" onclick="removeRow(this)" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 1.1rem;">&times;</button>
+        `;
+        optionsContainer.appendChild(div);
+        reindexRows();
+    }
+
+    function removeRow(btn) {
+        const rows = optionsContainer.getElementsByClassName('option-row');
+        if (rows.length <= 2) {
+            alert("At least 2 options are required for a question.");
+            return;
+        }
+        btn.parentElement.remove();
+        reindexRows();
+    }
+
+    function reindexRows() {
+        const rows = optionsContainer.getElementsByClassName('option-row');
+        for (let i = 0; i < rows.length; i++) {
+            const chk = rows[i].querySelector('.correct-chk');
+            chk.value = i;
+        }
+    }
+
+    // Single choice radio emulation in checkboxes
+    optionsContainer.addEventListener('change', (e) => {
+        if (e.target.classList.contains('correct-chk') && questionType.value === 'single') {
+            if (e.target.checked) {
+                const checks = optionsContainer.getElementsByClassName('correct-chk');
+                for (let i = 0; i < checks.length; i++) {
+                    if (checks[i] !== e.target) {
+                        checks[i].checked = false;
+                    }
+                }
+            }
+        }
+    });
+
+    // Reset checklist state on selection type change
+    questionType.addEventListener('change', () => {
+        const checks = optionsContainer.getElementsByClassName('correct-chk');
+        for (let i = 0; i < checks.length; i++) {
+            checks[i].checked = false;
+        }
+    });
+</script>
+{% endblock %}

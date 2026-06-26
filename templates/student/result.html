@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Scorecard - {{ exam.title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding: 20px 0; animation: fadeInUp 0.5s ease;">
+    <!-- Scorecard Summary Panel -->
+    <div class="glass-panel" style="margin-bottom: 30px; text-align: center; position: relative;">
+        <!-- Status Ribbon -->
+        <div style="position: absolute; top: 20px; right: 20px;">
+            {% if result.passed %}
+                <span class="badge badge-success" style="font-size: 1rem; padding: 6px 16px;">Pass</span>
+            {% else %}
+                <span class="badge badge-danger" style="font-size: 1rem; padding: 6px 16px;">Fail</span>
+            {% endif %}
+        </div>
+
+        <h2 style="font-size: 2.2rem; margin-bottom: 8px;">Exam Scorecard</h2>
+        <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 25px;">{{ exam.title }} (Subject: {{ exam.subject.name }})</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+            <div style="padding: 15px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Marks Secured</div>
+                <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px;">{{ result.score }} / {{ exam.total_marks }}</div>
+            </div>
+            
+            <div style="padding: 15px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Percentage</div>
+                <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px; color: var(--primary);">{{ result.percentage }}%</div>
+            </div>
+
+            <div style="padding: 15px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Letter Grade</div>
+                <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px; color: var(--secondary);">{{ result.grade or '--' }}</div>
+            </div>
+
+            <div style="padding: 15px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Attempt Date</div>
+                <div style="font-size: 1.1rem; font-weight: bold; margin-top: 12px;">{{ attempt.submitted_at.strftime('%Y-%m-%d') }}</div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 15px;">
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary">Go to Dashboard</a>
+            <!-- PDF Download -->
+            <a href="{{ url_for('reports.export_scorecard_pdf', attempt_id=attempt.id) }}" class="btn btn-primary">
+                📥 Download Scorecard (PDF)
+            </a>
+        </div>
+    </div>
+
+    <!-- Detailed Question Review -->
+    <div class="glass-panel">
+        <h3 style="font-size: 1.3rem; margin-bottom: 25px;">Detailed Question Analysis</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 30px;">
+            {% for q in questions %}
+                {% set student_choices = detailed_responses[q.id].student_choices %}
+                {% set correct_choices = detailed_responses[q.id].correct_choices %}
+                {% set is_correct = (student_choices|sort == correct_choices|sort) and (student_choices|length > 0) %}
+                
+                <div style="padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border); 
+                            background: {% if is_correct %}var(--success-bg-subtle){% elif student_choices|length == 0 %}rgba(255, 255, 255, 0.01){% else %}var(--danger-bg-subtle){% endif %};">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-weight: 600; color: var(--text-secondary);">Question {{ loop.index }}</span>
+                        <div>
+                            {% if is_correct %}
+                                <span class="badge badge-success">Correct (+{{ q.marks }} Marks)</span>
+                            {% elif student_choices|length == 0 %}
+                                <span class="badge badge-warning">Skipped (0 Marks)</span>
+                            {% else %}
+                                <span class="badge badge-danger">Incorrect (-{% if q.negative_marks > 0 %}{{ q.negative_marks }}{% else %}{{ exam.negative_marking_val }}{% endif %} Marks)</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <h4 style="font-size: 1.1rem; margin-bottom: 15px; font-weight: 500;">{{ q.question_text }}</h4>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        {% for opt in q.options %}
+                            {% set was_selected = opt.id in student_choices %}
+                            {% set is_correct_opt = opt.is_correct %}
+                            
+                            <div style="padding: 12px 15px; border-radius: 8px; border: 1px solid;
+                                        {% if is_correct_opt %}
+                                            border-color: var(--success); background: var(--success-bg); color: var(--success); font-weight: 600;
+                                        {% elif was_selected and not is_correct_opt %}
+                                            border-color: #ef4444; background: rgba(239, 68, 68, 0.1); color: #ef4444;
+                                        {% else %}
+                                            border-color: var(--glass-border); background: var(--input-bg);
+                                        {% endif %}
+                                        display: flex; justify-content: space-between; align-items: center;">
+                                <span>{{ opt.option_text }}</span>
+                                <span style="font-size: 0.8rem; font-weight: 600;">
+                                    {% if is_correct_opt and was_selected %}
+                                        ✓ Correct & Selected
+                                    {% elif is_correct_opt %}
+                                        ✓ Correct Answer
+                                    {% elif was_selected %}
+                                        ✗ Your Choice (Wrong)
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

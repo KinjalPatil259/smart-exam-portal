@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Manage Subjects - SmartExam{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Glassmorphic Edit Modal overlay */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 12, 33, 0.7);
+        backdrop-filter: blur(10px);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Edit Subject Modal -->
+<div id="edit-subject-modal" class="modal-overlay">
+    <div class="glass-panel" style="width: 100%; max-width: 500px; border-color: var(--primary);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 1.3rem;">Edit Subject Parameters</h3>
+            <button onclick="closeEditModal()" style="background: transparent; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer;">&times;</button>
+        </div>
+        
+        <form id="edit-subject-form" action="" method="POST">
+            <div class="form-group">
+                <label for="edit-name">Subject Name *</label>
+                <input type="text" id="edit-name" name="name" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="edit-code">Subject Code *</label>
+                <input type="text" id="edit-code" name="code" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="edit-description">Description</label>
+                <textarea id="edit-description" name="description" class="form-control" rows="3"></textarea>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div style="animation: fadeInUp 0.5s ease;">
+    <h2 style="font-size: 2rem; margin-bottom: 25px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Course Subjects Catalog
+    </h2>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+        <!-- Subjects List Directory -->
+        <div class="glass-panel">
+            <h3 style="margin-bottom: 15px; font-size: 1.25rem;">Active Registered Subjects</h3>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Subject Name</th>
+                            <th>Description</th>
+                            <th style="text-align: right;">Action Controls</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subject in subjects %}
+                            <tr>
+                                <td><span class="badge badge-info">{{ subject.code }}</span></td>
+                                <td><strong>{{ subject.name }}</strong></td>
+                                <td style="max-width: 250px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                                    {{ subject.description or 'No details provided.' }}
+                                </td>
+                                <td style="text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                                    <button class="btn btn-secondary btn-sm" onclick="openEditModal({{ subject.id }}, '{{ subject.name }}', '{{ subject.code }}', '{{ subject.description or '' }}')">
+                                        Edit
+                                    </button>
+                                    
+                                    <form action="{{ url_for('admin.delete_subject', subject_id=subject.id) }}" method="POST" onsubmit="return confirm('WARNING: Deleting this subject will permanently remove all associated scheduled examinations and student scores. Continue?');">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 30px 0;">No subjects registered. Setup course subjects using the panel on the right.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Subject Form -->
+        <div class="glass-panel" style="height: fit-content;">
+            <h3 style="margin-bottom: 20px; font-size: 1.25rem;">Register Course Subject</h3>
+            <form action="{{ url_for('admin.subjects') }}" method="POST">
+                <div class="form-group">
+                    <label for="name">Subject Name *</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Computer Networks" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="code">Subject Code *</label>
+                    <input type="text" id="code" name="code" class="form-control" placeholder="CS302" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Brief Description</label>
+                    <textarea id="description" name="description" class="form-control" rows="4" placeholder="Brief subject details..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Register Subject</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const editModal = document.getElementById('edit-subject-modal');
+    const editForm = document.getElementById('edit-subject-form');
+    const editName = document.getElementById('edit-name');
+    const editCode = document.getElementById('edit-code');
+    const editDesc = document.getElementById('edit-description');
+
+    function openEditModal(id, name, code, desc) {
+        editForm.action = `/admin/subject/edit/${id}`;
+        editName.value = name;
+        editCode.value = code;
+        editDesc.value = desc;
+        editModal.style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        editModal.style.display = 'none';
+    }
+
+    // Close when clicking overlay
+    window.onclick = function(event) {
+        if (event.target === editModal) {
+            closeEditModal();
+        }
+    }
+</script>
+{% endblock %}

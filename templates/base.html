@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Online Exam Management System{% endblock %}</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <!-- Base Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="navbar-brand">
+                <span>🎓</span> SmartExam
+            </a>
+            <ul class="nav-links">
+                {% if session.get('user_id') %}
+                    {% if session.get('role') == 'admin' %}
+                        <li><a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">Dashboard</a></li>
+                        <li><a href="{{ url_for('admin.students') }}" class="{% if request.endpoint == 'admin.students' %}active{% endif %}">Students</a></li>
+                        <li><a href="{{ url_for('admin.subjects') }}" class="{% if request.endpoint == 'admin.subjects' %}active{% endif %}">Subjects</a></li>
+                        <li><a href="{{ url_for('admin.exams') }}" class="{% if 'admin.exam' in request.endpoint or 'admin.question' in request.endpoint %}active{% endif %}">Exams</a></li>
+                        <li><a href="{{ url_for('admin.reports') }}" class="{% if request.endpoint == 'admin.reports' %}active{% endif %}">Reports</a></li>
+                        <li><a href="{{ url_for('auth.profile') }}" class="{% if request.endpoint == 'auth.profile' %}active{% endif %}">Settings</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('student.dashboard') }}" class="{% if request.endpoint == 'student.dashboard' %}active{% endif %}">Dashboard</a></li>
+                        <li><a href="{{ url_for('student.available_exams') }}" class="{% if request.endpoint == 'student.available_exams' or request.endpoint == 'exam.take_exam' %}active{% endif %}">Exams</a></li>
+                        <li><a href="{{ url_for('student.history') }}" class="{% if request.endpoint == 'student.history' %}active{% endif %}">History</a></li>
+                        <li><a href="{{ url_for('auth.profile') }}" class="{% if request.endpoint == 'auth.profile' %}active{% endif %}">Profile</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm" style="padding: 6px 12px;">Logout</a></li>
+                {% else %}
+                    <li><a href="/" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
+                    <li><a href="/about" class="{% if request.endpoint == 'about' %}active{% endif %}">About</a></li>
+                    <li><a href="/contact" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact</a></li>
+                    <li><a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-sm">Login</a></li>
+                    <li><a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Register</a></li>
+                {% endif %}
+                <li>
+                    <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Light/Dark Mode">☀️</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Workspace Container -->
+    <main class="container" style="margin-top: 30px; min-height: calc(100vh - 240px);">
+        <!-- Flash Alert Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <span>{{ message }}</span>
+                            <span class="alert-close">&times;</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Content Block -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Smart Online Exam Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Base Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

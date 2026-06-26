@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block title %}Performance Reports - SmartExam{% endblock %}
+
+{% block content %}
+<div style="animation: fadeInUp 0.5s ease;">
+    <h2 style="font-size: 2rem; margin-bottom: 25px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Student Grading & Performance Reports
+    </h2>
+
+    <!-- Selection Panel -->
+    <div class="glass-panel" style="margin-bottom: 30px;">
+        <h3 style="margin-bottom: 15px; font-size: 1.25rem;">Select Examination Session</h3>
+        <form action="{{ url_for('admin.reports') }}" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+            <div class="form-group" style="flex-grow: 1; margin-bottom: 0;">
+                <label for="exam_id" style="margin-bottom: 6px;">Active Exams</label>
+                <select id="exam_id" name="exam_id" class="form-control" style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" onchange="this.form.submit()">
+                    <option value="">-- View All Scheduled Exam Attempts --</option>
+                    {% for exam in exams %}
+                        <option value="{{ exam.id }}" {% if request.args.get('exam_id')|int == exam.id %}selected{% endif %}>
+                            {{ exam.subject.code }} - {{ exam.title }} (Duration: {{ exam.duration_minutes }} mins)
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-secondary">Filter Attempts</button>
+        </form>
+    </div>
+
+    <!-- Results Table Panel -->
+    <div class="glass-panel">
+        {% set selected_exam_id = request.args.get('exam_id') %}
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+            <h3 style="font-size: 1.25rem;">Attempt Gradebook</h3>
+            
+            <!-- Export Buttons -->
+            {% if selected_exam_id %}
+                <div style="display: flex; gap: 10px;">
+                    <!-- Excel Export -->
+                    <a href="{{ url_for('reports.export_exam_excel', exam_id=selected_exam_id) }}" class="btn btn-secondary btn-sm" style="background: var(--success-bg); border-color: var(--success-border); color: var(--success);">
+                        📊 Export to Excel
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Roll Number</th>
+                        <th>Exam Session</th>
+                        <th>Secured Score</th>
+                        <th>Percentage</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set ns = namespace(attempts=[]) %}
+                    
+                    {% if selected_exam_id %}
+                        <!-- Fetch attempts for chosen exam -->
+                        {% for exam in exams if exam.id == selected_exam_id|int %}
+                            {% set ns.attempts = exam.attempts %}
+                        {% endfor %}
+                    {% else %}
+                        <!-- Fetch all attempts in DB -->
+                        {% for exam in exams %}
+                            {% for attempt in exam.attempts %}
+                                {% set ns.attempts = ns.attempts + [attempt] %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {% for attempt in ns.attempts %}
+                        <tr>
+                            <td><strong>{{ attempt.student.name }}</strong></td>
+                            <td><code style="font-size: 0.95rem;">{{ attempt.student.roll_number }}</code></td>
+                            <td>{{ attempt.exam.title }} <small style="color: var(--text-muted);">({{ attempt.exam.subject.code }})</small></td>
+                            <td>
+                                {% if attempt.status == 'submitted' %}
+                                    <strong>{{ attempt.score }}</strong> / {{ attempt.exam.total_marks }}
+                                {% else %}
+                                    --
+                                 {% endif %}
+                            </td>
+                            <td>
+                                {% if attempt.status == 'submitted' and attempt.result %}
+                                    {{ attempt.result.percentage }}%
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if attempt.status == 'submitted' and attempt.result %}
+                                    <span style="font-weight: bold; color: var(--secondary);">{{ attempt.result.grade }}</span>
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if attempt.status == 'submitted' %}
+                                    {% if attempt.is_passed %}
+                                        <span class="badge badge-success">Passed</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Failed</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge badge-warning">In Progress</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                                {% if attempt.status == 'submitted' %}
+                                    <a href="{{ url_for('exam.view_result', attempt_id=attempt.id) }}" class="btn btn-secondary btn-sm" style="padding: 4px 8px; font-size: 0.75rem;">View Answers</a>
+                                    <a href="{{ url_for('reports.export_scorecard_pdf', attempt_id=attempt.id) }}" class="btn btn-primary btn-sm" style="padding: 4px 8px; font-size: 0.75rem;">PDF Card</a>
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" style="text-align: center; color: var(--text-secondary); padding: 30px 0;">No student attempt records match the filter criteria.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

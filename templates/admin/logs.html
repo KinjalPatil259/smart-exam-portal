@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}System Audit Logs - SmartExam{% endblock %}
+
+{% block content %}
+<div style="animation: fadeInUp 0.5s ease;">
+    <h2 style="font-size: 2rem; margin-bottom: 25px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        System Audit Logs
+    </h2>
+
+    <!-- Search/Filter Logs -->
+    <div class="glass-panel" style="margin-bottom: 30px;">
+        <form action="{{ url_for('admin.logs') }}" method="GET" style="display: flex; gap: 15px; align-items: flex-end;">
+            <div class="form-group" style="flex-grow: 1; margin-bottom: 0;">
+                <label for="search" style="margin-bottom: 6px;">Filter Action / IP Address / Description Details</label>
+                <input type="text" id="search" name="search" class="form-control" placeholder="Search for 'Login', 'Exam Started', '127.0.0.1'..." value="{{ search }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Search Logs</button>
+            {% if search %}
+                <a href="{{ url_for('admin.logs') }}" class="btn btn-secondary">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Logs Table -->
+    <div class="glass-panel">
+        <h3 style="margin-bottom: 20px; font-size: 1.25rem;">Operation Activity Trail</h3>
+        <div class="table-responsive">
+            <table class="table" style="font-size: 0.85rem;">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Log ID</th>
+                        <th>User Email / Role</th>
+                        <th>Action Logged</th>
+                        <th>Date & Time (UTC)</th>
+                        <th>Client IP</th>
+                        <th>Action Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td><code>#{{ log.id }}</code></td>
+                            <td>
+                                {% if log.user %}
+                                    <strong>{{ log.user.email }}</strong>
+                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px;">Role: {{ log.user.role }}</div>
+                                {% else %}
+                                    <em style="color: var(--text-muted);">Anonymous / System</em>
+                                {% endif %}
+                            </td>
+                            <td><strong style="color: var(--primary);">{{ log.action }}</strong></td>
+                            <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td><code>{{ log.ip_address or '0.0.0.0' }}</code></td>
+                            <td style="color: var(--text-secondary); max-width: 300px; line-height: 1.4;">
+                                {{ log.details or '' }}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 30px 0;">No system log events recorded matching search filters.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Admin Settings - SmartExam{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; padding: 20px 0; animation: fadeInUp 0.5s ease;">
+    <div class="glass-panel">
+        <h2 style="font-size: 2rem; margin-bottom: 25px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            System Administrator Settings
+        </h2>
+        
+        <form action="{{ url_for('auth.profile') }}" method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="name">Admin Full Name *</label>
+                    <input type="text" id="name" name="name" class="form-control" value="{{ admin.name }}" required>
+                </div>
+
+                <!-- Email (Readonly) -->
+                <div class="form-group">
+                    <label>Account Login Email</label>
+                    <input type="email" class="form-control" value="{{ current_user.email }}" readonly style="cursor: not-allowed; opacity: 0.7;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Employee ID (Readonly) -->
+                <div class="form-group">
+                    <label>Employee ID</label>
+                    <input type="text" class="form-control" value="{{ admin.employee_id }}" readonly style="cursor: not-allowed; opacity: 0.7;">
+                </div>
+
+                <!-- Department -->
+                <div class="form-group">
+                    <label for="department">Department / Team</label>
+                    <input type="text" id="department" name="department" class="form-control" value="{{ admin.department or '' }}" placeholder="Examination Cell">
+                </div>
+            </div>
+            
+            <hr style="border: 0; height: 1px; background: var(--glass-border); margin: 35px 0;">
+            
+            <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: var(--text-primary);">Change Account Password</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label for="new_password">New Password</label>
+                    <input type="password" id="new_password" name="new_password" class="form-control" placeholder="Leave blank to keep current">
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm New Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Re-enter new password">
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px;">
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Settings</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

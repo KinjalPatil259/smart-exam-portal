@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Contact Support - SmartExam{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto; padding: 40px 0; animation: fadeInUp 0.6s ease;">
+    <div class="glass-panel">
+        <h2 style="font-size: 2.2rem; margin-bottom: 10px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center;">
+            Contact Support
+        </h2>
+        <p style="color: var(--text-secondary); text-align: center; margin-bottom: 30px; font-size: 0.95rem;">
+            Have questions or running into technical difficulties? Submit an inquiry ticket below.
+        </p>
+        
+        <form onsubmit="event.preventDefault(); alert('Your message has been received! Our support representatives will get back to you shortly.'); this.reset();">
+            <div class="form-group">
+                <label for="contact-name">Your Name</label>
+                <input type="text" id="contact-name" class="form-control" placeholder="John Doe" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="contact-email">Email Address</label>
+                <input type="email" id="contact-email" class="form-control" placeholder="john@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="contact-subject">Inquiry Subject</label>
+                <input type="text" id="contact-subject" class="form-control" placeholder="Technical help / Question query" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="contact-message">Detailed Message</label>
+                <textarea id="contact-message" class="form-control" rows="5" placeholder="Write details here..." required></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Send Message</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

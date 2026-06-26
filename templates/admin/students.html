@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Manage Students - SmartExam{% endblock %}
+
+{% block content %}
+<div style="animation: fadeInUp 0.5s ease;">
+    <h2 style="font-size: 2rem; margin-bottom: 25px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Student Accounts Directory
+    </h2>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+        <!-- Students Directory List -->
+        <div class="glass-panel">
+            <h3 style="margin-bottom: 15px; font-size: 1.25rem;">Active Enrolled Students</h3>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student Details</th>
+                            <th>Roll Number</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Action Control</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                            <tr>
+                                <td>
+                                    <strong>{{ student.name }}</strong>
+                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px;">{{ student.user.email }}</div>
+                                </td>
+                                <td><code style="font-size: 0.9rem;">{{ student.roll_number }}</code></td>
+                                <td>{{ student.department or 'N/A' }}</td>
+                                <td>
+                                    {% if student.user.status == 'active' %}
+                                        <span class="badge badge-success">Active</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Suspended</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                                    <!-- Toggle Status Button -->
+                                    <form action="{{ url_for('admin.toggle_student', user_id=student.user_id) }}" method="POST">
+                                        <button type="submit" class="btn btn-secondary btn-sm" style="padding: 6px 12px;">
+                                            {% if student.user.status == 'active' %}Suspend{% else %}Activate{% endif %}
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Delete Button -->
+                                    <form action="{{ url_for('admin.delete_student', user_id=student.user_id) }}" method="POST" onsubmit="return confirm('Confirm deletion of student profile? Account details and attempts history will be lost.');">
+                                        <button type="submit" class="btn btn-danger btn-sm" style="padding: 6px 12px;">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 30px 0;">No students registered. Use the panel on the right to register students.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Student Form -->
+        <div class="glass-panel" style="height: fit-content;">
+            <h3 style="margin-bottom: 20px; font-size: 1.25rem;">Enroll New Student</h3>
+            <form action="{{ url_for('admin.students') }}" method="POST">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="John Doe" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Username *</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="john@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="roll_number">Roll / Student ID *</label>
+                    <input type="text" id="roll_number" name="roll_number" class="form-control" placeholder="STU1001" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <input type="text" id="department" name="department" class="form-control" placeholder="Computer Science">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="text" id="phone" name="phone" class="form-control" placeholder="+123456789">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Initial Password *</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Minimum 6 characters" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Register Student</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

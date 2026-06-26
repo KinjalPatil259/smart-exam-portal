@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Attempts History - SmartExam{% endblock %}
+
+{% block content %}
+<div style="animation: fadeInUp 0.5s ease;">
+    <h2 style="font-size: 2rem; margin-bottom: 25px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Attempts History
+    </h2>
+
+    <div class="glass-panel">
+        <h3 style="margin-bottom: 20px; font-size: 1.25rem;">Your Performance Log</h3>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Exam Title</th>
+                        <th>Attempt Date</th>
+                        <th>Status</th>
+                        <th>Marks Secured</th>
+                        <th>Percentage</th>
+                        <th>Grade</th>
+                        <th>Result</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for attempt in attempts %}
+                        <tr>
+                            <td><span class="badge badge-info">{{ attempt.exam.subject.code }}</span></td>
+                            <td><strong>{{ attempt.exam.title }}</strong></td>
+                            <td>{{ attempt.submitted_at.strftime('%Y-%m-%d %H:%M') if attempt.submitted_at else attempt.started_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if attempt.status == 'submitted' %}
+                                    <span class="badge badge-success">Submitted</span>
+                                {% else %}
+                                    <span class="badge badge-warning">In Progress</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if attempt.status == 'submitted' %}
+                                    {{ attempt.score }} / {{ attempt.exam.total_marks }}
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if attempt.status == 'submitted' and attempt.result %}
+                                    <strong>{{ attempt.result.percentage }}%</strong>
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if attempt.status == 'submitted' and attempt.result %}
+                                    <span style="font-weight: bold; color: var(--secondary);">{{ attempt.result.grade }}</span>
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if attempt.status == 'submitted' %}
+                                    {% if attempt.is_passed %}
+                                        <span class="badge badge-success">Passed</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Failed</span>
+                                    {% endif %}
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                                {% if attempt.status == 'submitted' %}
+                                    <a href="{{ url_for('exam.view_result', attempt_id=attempt.id) }}" class="btn btn-secondary btn-sm">Scorecard</a>
+                                    <a href="{{ url_for('reports.export_scorecard_pdf', attempt_id=attempt.id) }}" class="btn btn-primary btn-sm" title="Download PDF Report">PDF</a>
+                                {% else %}
+                                    <a href="{{ url_for('exam.take_exam', attempt_id=attempt.id) }}" class="btn btn-warning btn-sm">Resume</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="9" style="text-align: center; color: var(--text-secondary); padding: 40px 0;">
+                                No exam attempts have been recorded yet. 
+                                <br><br>
+                                <a href="{{ url_for('student.available_exams') }}" class="btn btn-primary btn-sm">Take your first exam</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

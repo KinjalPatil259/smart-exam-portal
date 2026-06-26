@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Smart Online Exam Management System{% endblock %}
+
+{% block content %}
+<div style="padding: 60px 0; text-align: center; animation: fadeInUp 0.8s ease;">
+    <h1 style="font-size: 3.5rem; font-weight: 800; font-family: 'Outfit', sans-serif; line-height: 1.2; margin-bottom: 20px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        The Smarter Way to Conduct Online Exams
+    </h1>
+    <p style="font-size: 1.25rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto 35px auto;">
+        An industry-level, highly secure, and intuitive examination environment. Empowering administrators to design custom assessments and students to achieve excellence with instant analytical feedback.
+    </p>
+    
+    <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 50px;">
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('admin.dashboard' if session.get('role') == 'admin' else 'student.dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="padding: 12px 30px; font-size: 1rem;">Get Started</a>
+            <a href="/about" class="btn btn-secondary" style="padding: 12px 30px; font-size: 1rem;">Learn More</a>
+        {% endif %}
+    </div>
+
+    <!-- Core Features Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 40px; text-align: left;">
+        <div class="glass-panel" style="padding: 30px;">
+            <div style="font-size: 2.5rem; margin-bottom: 15px;">🛡️</div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 10px;">Secure Assessment</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Armed with tab-focus tracking, session safeguards, role controls, and secure password hashing.
+            </p>
+        </div>
+
+        <div class="glass-panel" style="padding: 30px;">
+            <div style="font-size: 2.5rem; margin-bottom: 15px;">⏱️</div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 10px;">Automated Timer</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Built-in digital countdown timers. Automatically submits student response forms when duration expires.
+            </p>
+        </div>
+
+        <div class="glass-panel" style="padding: 30px;">
+            <div style="font-size: 2.5rem; margin-bottom: 15px;">📈</div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 10px;">Analytics & Reports</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Instant score calculation, pass/fail thresholds, and PDF score report downloading.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
